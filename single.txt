@@ -1,3 +1,7 @@
+
+
+
+
 docker network create wpnet && docker run -d --name wp-mysql --network wpnet -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=wp123 mysql:5.7 && sleep 20 && docker run -d --name wordpress --network wpnet -p 8080:80 -e WORDPRESS_DB_HOST=wp-mysql:3306 -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=wp123 -e WORDPRESS_DB_NAME=wordpress wordpress
 
 
