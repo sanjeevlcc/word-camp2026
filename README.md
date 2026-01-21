@@ -37,7 +37,7 @@ docker run -d --name wordpress --network wpnet \
 
 
 
-## 🛠️ Deployment Scripts
+
 
 
 ### 🛠️ Deployment Scripts 2
