@@ -8,7 +8,7 @@ This document contains the specific one-liner commands to launch isolated WordPr
 ## 🛠️ Deployment Scripts
 
 ### 1. WordPress Instance 1 (Standard Network)
-[cite_start]This script creates a custom bridge network named `wpnet` to allow the WordPress container to communicate with the MySQL container by name[cite: 73, 82, 84].
+This script creates a custom bridge network named `wpnet` to allow the WordPress container to communicate with the MySQL container by name.
 
 ```bash
 # Create a dedicated network
@@ -38,7 +38,7 @@ docker run -d --name wordpress --network wpnet \
 
 
 
-
+## 🛠️ Deployment Scripts 2
 
 ### 2. WordPress Instance 2 (Secondary Port)
 Use this script to launch a second independent instance on port 9090. This creates a separate database container to avoid naming conflicts on your system.
