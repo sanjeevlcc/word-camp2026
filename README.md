@@ -37,8 +37,10 @@ docker run -d --name wordpress --network wpnet \
 
 
 
+## 🛠️ Deployment Scripts
 
-## 🛠️ Deployment Scripts 2
+
+### 🛠️ Deployment Scripts 2
 
 ### 2. WordPress Instance 2 (Secondary Port)
 Use this script to launch a second independent instance on port 9090. This creates a separate database container to avoid naming conflicts on your system.
