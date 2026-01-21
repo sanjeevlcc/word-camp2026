@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+
+  nginx:
+    image: nginx:latest
+    container_name: thanos-nginx
+    ports:
+      - "9095:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - wordpress_data:/var/www/html
+    depends_on:
+      - wordpress
+    restart: always
+
+  wordpress:
+    image: wordpress:php8.2-fpm
+    container_name: thanos-wordpress
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wp123
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_REDIS_HOST: redis
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+
+  mysql:
+    image: mariadb:10.6
+    container_name: thanos-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wp123
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: thanos-redis
+    restart: always
+
+volumes:
+  wordpress_data:
+  mysql_data:
