@@ -29,3 +29,24 @@ This project organizes a high-performance WordPress stack where each service is 
 ---
 
 > *"Perfectly balanced, as all things should be."* — **Thanos**
+
+
+
+
+
+## 🚀 Quick Start (The Snap)
+
+To bring the gauntlet to life and deploy the stack instantly, follow these steps:
+
+1. **Prepare the environment:**
+   Make sure you have `docker-compose.yml` and the `nginx/default.conf` files ready in your directory.
+
+2. **Launch the stack:**
+   Run the following command in your terminal:
+   ```bash
+   docker-compose up -d
+
+3. **Check if all "stones" are active:**
+   Run the following command in your terminal:
+   ```bash
+   docker ps
