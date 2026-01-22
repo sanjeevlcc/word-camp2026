@@ -1,8 +1,11 @@
-version: "3.8"
+
+
+
+version: "3.8"                  ## Docker Compose - Reality
 
 services:
   nginx-wp5:
-    image: nginx:latest
+    image: nginx:latest                  ## Power
     container_name: wp5-nginx
     ports:
       - "9097:80"
@@ -13,8 +16,10 @@ services:
       - wp5
     restart: always
 
+
+
   wp5:
-    image: wordpress:php8.2-fpm
+    image: wordpress:php8.2-fpm                  ## Mind
     container_name: wp5-wordpress
     environment:
       WORDPRESS_DB_HOST: db5:3306
@@ -29,8 +34,10 @@ services:
       - redis5
     restart: always
 
+
+
   db5:
-    image: mariadb:10.6
+    image: mariadb:10.6                  ##  Soul 
     container_name: wp5-db
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -41,7 +48,10 @@ services:
       - db5_data:/var/lib/mysql
     restart: always
 
-  redis5:
+
+
+
+  redis5:                  ## Time
     image: redis:alpine
     container_name: wp5-redis
     restart: always
@@ -49,3 +59,4 @@ services:
 volumes:
   wp5_data:
   db5_data:
+
