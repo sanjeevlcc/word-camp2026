@@ -48,7 +48,7 @@ docker run -d --name wordpress-1 \
 
 
 
----
+
 
 ### 2. WordPress Instance 2
 
