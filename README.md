@@ -1,5 +1,9 @@
 # word-camp2026
 
+## 📚 Resources
+* **Project Files & Assets:** [Google Drive Folder](https://drive.google.com/drive/folders/183I_chrMV2J-zyh_jzg7e4OH82KrVJtv?usp=drive_link)
+
+---
 
 # 🚀 WordPress Deployment via Docker CLI
 
@@ -33,40 +37,3 @@ docker run -d --name wordpress --network wpnet \
   -e WORDPRESS_DB_PASSWORD=wp123 \
   -e WORDPRESS_DB_NAME=wordpress \
   wordpress
-
-
-
-
-
-
-
-### 🛠️ Deployment Scripts 2
-
-### 2. WordPress Instance 2 (Secondary Port)
-Use this script to launch a second independent instance on port 9090. This creates a separate database container to avoid naming conflicts on your system.
-
-```bash
-# Launch the second Database
-docker run -d --name wp-mysql-2 \
-  -e MYSQL_ROOT_PASSWORD=root \
-  -e MYSQL_DATABASE=wordpress \
-  -e MYSQL_USER=wpuser \
-  -e MYSQL_PASSWORD=wp123 \
-  mysql:5.7 && \
-
-# Wait for DB initialization
-sleep 20 && \
-
-# Launch second WordPress instance on Port 9090
-docker run -d --name wordpress-9090 \
-  -p 9090:80 \
-  -e WORDPRESS_DB_HOST=wp-mysql-2:3306 \
-  -e WORDPRESS_DB_USER=wpuser \
-  -e WORDPRESS_DB_PASSWORD=wp123 \
-  -e WORDPRESS_DB_NAME=wordpress \
-  wordpress
-
-
-
-
-
