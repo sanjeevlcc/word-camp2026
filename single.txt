@@ -1,35 +1,124 @@
 
-
-
-
-docker network create wpnet && docker run -d --name wp-mysql --network wpnet -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=wp123 mysql:5.7 && sleep 20 && docker run -d --name wordpress --network wpnet -p 8080:80 -e WORDPRESS_DB_HOST=wp-mysql:3306 -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=wp123 -e WORDPRESS_DB_NAME=wordpress wordpress
-
-
-
-
-==================================WORDPRESS1
-
-docker network create wpnet && 
-
-docker run -d --name wp-mysql --network wpnet -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=wp123 mysql:5.7 && 
-
-sleep 20 && 
-
-docker run -d --name wordpress --network wpnet -p 8080:80 -e WORDPRESS_DB_HOST=wp-mysql:3306 -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=wp123 -e WORDPRESS_DB_NAME=wordpress wordpress
-
-==================================
+*************************
+EXAMPLE 1 : 80 >> 8080
+EXAMPLE 2 : 80 >> 9090
+EXAMPLE 3 : 80 >> 9095
+*************************
 
 
 
 
 
-=====================================WORDPRESS-2
+WordPress 1: Using --link (Port 8080)
+Database: db1
+Host Port: 8080
+******************************************************************
 
-docker run -d --name wp-mysql-2 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=wordpress -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=wp123 mysql:5.7 &&
+# Start Database 1
+docker run -d --name wp-db-1 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=db1 \
+  -e MYSQL_USER=wpuser \
+  -e MYSQL_PASSWORD=wp123 \
+  mysql:5.7
 
-sleep 20 &&
-
-docker run -d --name wordpress-9090 -p 9090:80 -e WORDPRESS_DB_HOST=wp-mysql-2:3306 -e WORDPRESS_DB_USER=wpuser -e WORDPRESS_DB_PASSWORD=wp123 -e WORDPRESS_DB_NAME=wordpress wordpress
 
 
-=====================================
+# Wait for DB to initialize
+sleep 20
+
+
+
+# Start WordPress 1 linked to wp-db-1
+docker run -d --name wordpress-1 \
+  --link wp-db-1:mysql \
+  -p 8080:80 \
+  -e WORDPRESS_DB_HOST=mysql \
+  -e WORDPRESS_DB_USER=wpuser \
+  -e WORDPRESS_DB_PASSWORD=wp123 \
+  -e WORDPRESS_DB_NAME=db1 \
+  wordpress
+
+
+******************************************************************
+
+
+
+
+
+
+
+
+
+WordPress 2: Using --link (Port 9090)
+Database: db2
+Host Port: 9090
+
+******************************************************************
+# Start Database 2
+docker run -d --name wp-db-2 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=db2 \
+  -e MYSQL_USER=wpuser \
+  -e MYSQL_PASSWORD=wp123 \
+  mysql:5.7
+
+# Wait for DB to initialize
+sleep 20
+
+# Start WordPress 2 linked to wp-db-2
+docker run -d --name wordpress-2 \
+  --link wp-db-2:mysql \
+  -p 9090:80 \
+  -e WORDPRESS_DB_HOST=mysql \
+  -e WORDPRESS_DB_USER=wpuser \
+  -e WORDPRESS_DB_PASSWORD=wp123 \
+  -e WORDPRESS_DB_NAME=db2 \
+  wordpress
+******************************************************************
+
+
+
+
+
+
+
+
+
+WordPress 3: Using Docker Network (Port 9095)
+
+Database: db3
+Host Port: 9095
+Network: wp-net-3
+******************************************************************
+# Create a dedicated network for WP3 isolation
+docker network create wp-net-3
+
+# Start Database 3 on the new network
+docker run -d --name wp-db-3 \
+  --network wp-net-3 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=db3 \
+  -e MYSQL_USER=wpuser \
+  -e MYSQL_PASSWORD=wp123 \
+  mysql:5.7
+
+
+# Wait for DB to initialize
+sleep 20
+
+
+# Start WordPress 3 on the same network
+# Note: We use the container name 'wp-db-3' as the host address
+docker run -d --name wordpress-3 \
+  --network wp-net-3 \
+  -p 9095:80 \
+  -e WORDPRESS_DB_HOST=wp-db-3 \
+  -e WORDPRESS_DB_USER=wpuser \
+  -e WORDPRESS_DB_PASSWORD=wp123 \
+  -e WORDPRESS_DB_NAME=db3 \
+  wordpress
+******************************************************************
+
+
+
