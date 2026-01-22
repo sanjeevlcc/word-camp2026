@@ -11,8 +11,8 @@ This document contains the specific one-liner commands to launch isolated WordPr
 
 ## 🛠️ Deployment Scripts
 
-### 1. WordPress Instance 1 (Standard Network)
-This script creates a custom bridge network named `wpnet` to allow the WordPress container to communicate with the MySQL container by name.
+### 1. WordPress Instance 1 
+This script creates a default  bridge  to allow the WordPress container to communicate with the MySQL container by name.
 
 ```bash
 
@@ -46,36 +46,80 @@ docker run -d --name wordpress-1 \
 
 
 
-### 2. WordPress Instance 2 (Standard Network)
 
-This script creates a custom bridge network named `wpnet-2` to allow the WordPress container to communicate with its dedicated MySQL container by name, ensuring full isolation from Instance 1.
+
+
+### 2. WordPress Instance 2
+
+This script creates a default  bridge  to allow the WordPress container to communicate with its dedicated MySQL container by name, ensuring full isolation from Instance 2.
 
 ```bash
-# Create a dedicated network for Instance 2
-docker network create wpnet-2 && \
-
-# Launch the Database (MySQL 5.7)
-docker run -d --name wp-mysql-2 --network wpnet-2 \
+# Start Database 2
+docker run -d --name wp-db-2 \
   -e MYSQL_ROOT_PASSWORD=root \
-  -e MYSQL_DATABASE=wordpress \
+  -e MYSQL_DATABASE=db2 \
   -e MYSQL_USER=wpuser \
   -e MYSQL_PASSWORD=wp123 \
-  mysql:5.7 && \
+  mysql:5.7
 
-# Wait for DB initialization (Crucial for connection)
-sleep 20 && \
+# Wait for DB to initialize
+sleep 20
 
-# Launch WordPress on Port 9090
-docker run -d --name wordpress-2 --network wpnet-2 \
+# Start WordPress 2 linked to wp-db-2
+docker run -d --name wordpress-2 \
+  --link wp-db-2:mysql \
   -p 9090:80 \
-  -e WORDPRESS_DB_HOST=wp-mysql-2:3306 \
+  -e WORDPRESS_DB_HOST=mysql \
   -e WORDPRESS_DB_USER=wpuser \
   -e WORDPRESS_DB_PASSWORD=wp123 \
-  -e WORDPRESS_DB_NAME=wordpress \
+  -e WORDPRESS_DB_NAME=db2 \
   wordpress
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+### 2. WordPress Instance 3
+
+This script creates a custom bridge network named `wp-net-3` to allow the WordPress container to communicate with its dedicated MySQL container by name, ensuring full isolation from Instance  1 and 2.
+
+```bash
+# Create a dedicated network for WP3 isolation
+docker network create wp-net-3
+
+# Start Database 3 on the new network
+docker run -d --name wp-db-3 \
+  --network wp-net-3 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=db3 \
+  -e MYSQL_USER=wpuser \
+  -e MYSQL_PASSWORD=wp123 \
+  mysql:5.7
+
+
+# Wait for DB to initialize
+sleep 20
+
+
+# Start WordPress 3 on the same network
+# Note: We use the container name 'wp-db-3' as the host address
+docker run -d --name wordpress-3 \
+  --network wp-net-3 \
+  -p 9095:80 \
+  -e WORDPRESS_DB_HOST=wp-db-3 \
+  -e WORDPRESS_DB_USER=wpuser \
+  -e WORDPRESS_DB_PASSWORD=wp123 \
+  -e WORDPRESS_DB_NAME=db3 \
+  wordpress
 
 
