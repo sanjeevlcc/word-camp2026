@@ -1,34 +1,39 @@
 version: "3.8"
 
 services:
-  mysql:
+  db4:
     image: mysql:5.7
-    container_name: wp-mysql-9095
+    container_name: wp-db-4
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: wordpress
+      MYSQL_DATABASE: db4
       MYSQL_USER: wpuser
       MYSQL_PASSWORD: wp123
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_4:/var/lib/mysql
 
-  wordpress:
+
+
+  wp4:
     image: wordpress:latest
-    container_name: wordpress-9095
+    container_name: wordpress-4
     depends_on:
-      - mysql
+      - db4
     restart: always
     ports:
-      - "9095:80"
+      - "9096:80"  # Changed to 9096 to avoid conflict with  WP3 (9095)
     environment:
-      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_HOST: db4:3306
       WORDPRESS_DB_USER: wpuser
       WORDPRESS_DB_PASSWORD: wp123
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_NAME: db4
     volumes:
-      - wp_data:/var/www/html
+      - wp_data_4:/var/www/html
+
+
+
 
 volumes:
-  mysql_data:
-  wp_data:
+  mysql_data_4:
+  wp_data_4:
