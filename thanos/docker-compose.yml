@@ -1,52 +1,51 @@
 version: "3.8"
 
 services:
-
-  nginx:
+  nginx-wp5:
     image: nginx:latest
-    container_name: thanos-nginx
+    container_name: wp5-nginx
     ports:
-      - "9095:80"
+      - "9097:80"
     volumes:
       - ./nginx:/etc/nginx/conf.d
-      - wordpress_data:/var/www/html
+      - wp5_data:/var/www/html
     depends_on:
-      - wordpress
+      - wp5
     restart: always
 
-  wordpress:
+  wp5:
     image: wordpress:php8.2-fpm
-    container_name: thanos-wordpress
+    container_name: wp5-wordpress
     environment:
-      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_HOST: db5:3306
       WORDPRESS_DB_USER: wpuser
       WORDPRESS_DB_PASSWORD: wp123
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_REDIS_HOST: redis
+      WORDPRESS_DB_NAME: db5
+      WORDPRESS_REDIS_HOST: redis5
     volumes:
-      - wordpress_data:/var/www/html
+      - wp5_data:/var/www/html
     depends_on:
-      - mysql
-      - redis
+      - db5
+      - redis5
     restart: always
 
-  mysql:
+  db5:
     image: mariadb:10.6
-    container_name: thanos-mysql
+    container_name: wp5-db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: wordpress
+      MYSQL_DATABASE: db5
       MYSQL_USER: wpuser
       MYSQL_PASSWORD: wp123
     volumes:
-      - mysql_data:/var/lib/mysql
+      - db5_data:/var/lib/mysql
     restart: always
 
-  redis:
+  redis5:
     image: redis:alpine
-    container_name: thanos-redis
+    container_name: wp5-redis
     restart: always
 
 volumes:
-  wordpress_data:
-  mysql_data:
+  wp5_data:
+  db5_data:
