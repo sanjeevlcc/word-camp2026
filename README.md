@@ -41,7 +41,6 @@ docker run -d --name wordpress-1 \
   -e WORDPRESS_DB_NAME=db1 \
   wordpress
 
-'''
 
 
 
@@ -49,6 +48,7 @@ docker run -d --name wordpress-1 \
 
 
 
+---
 
 ### 2. WordPress Instance 2
 
@@ -88,7 +88,7 @@ docker run -d --name wordpress-2 \
 
 
 
-
+---
 
 ### 2. WordPress Instance 3
 
