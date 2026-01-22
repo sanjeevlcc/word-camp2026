@@ -41,6 +41,7 @@ docker run -d --name wordpress-1 \
   -e WORDPRESS_DB_NAME=db1 \
   wordpress
 
+'''
 
 
 
