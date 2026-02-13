@@ -135,25 +135,7 @@ docker --version
 
 Step 3.2 — Create Dockerfile
 -------------------------------------------
-
-cd ~/university-portal
-
-cat > Dockerfile <<'EOF'
-FROM python:3.12-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY app.py .
-COPY templates ./templates
-
-ENV RUN_MODE="Docker"
-ENV APP_SECRET="change-me"
-
-EXPOSE 5000
-CMD ["gunicorn","-w","1","-b","0.0.0.0:5000","app:app"]
-EOF
+https://github.com/sanjeevlcc/word-camp2026/blob/main/Lumbini%20Tech%20Month_%20Butwal%20_Feb%202026/Dockerfile
 
 
 
@@ -188,8 +170,9 @@ docker run --rm --name uniportal -p 5000:5000 university-portal:1
 ******************************************
 4) Kubernetes (self-healing + HPA + rollback) 
 ******************************************
+
 4-node minikube cluster 
-(✅ 1 control-plane + 3 workers) 
+(✅ 1 control-plane + 1 workers) 
 
 the workers as:
     worker-1 = butwal   portal-m02
@@ -197,15 +180,21 @@ the workers as:
     worker-3 = dang     portal-m04
 
     
-portal, portal-m02, portal-m03, portal-m04
+controlplane:~$ kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+controlplane   Ready    control-plane   13d   v1.34.3
+node01         Ready    <none>          12d   v1.34.3
 
 
+
+Step 4.2 — Create Kubernetes manifests
 -------------------------------------------
+https://github.com/sanjeevlcc/word-camp2026/blob/main/Lumbini%20Tech%20Month_%20Butwal%20_Feb%202026/my_app.yaml
 
 
 
-
-
+Apply:
+     kubectl apply -f k8s.yaml
 
 
 
