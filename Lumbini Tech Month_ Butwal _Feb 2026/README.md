@@ -26,11 +26,11 @@ cd ~/university-portal
 
 Step 1.2 — Create requirements.txt
 -------------------------------------------
-cat > requirements.txt <<'EOF'
+
 flask==3.0.3
 gunicorn==22.0.0
 werkzeug==3.0.3
-EOF
+
 
 
 
@@ -76,10 +76,14 @@ sudo apt install -y python3 python3-venv python3-pip
 Step 2.2 — Create venv + install dependencies
 -------------------------------------------
 pwd
-cd ~/university-portal
+pwd
+sleep 2
+cd /root/word-camp2026/Lumbini\ Tech\ Month_\ Butwal\ _Feb\ 2026/
 python3 -m venv venv
 source venv/bin/activate
+sleep 5
 pip install -r requirements.txt
+
 
 
 
