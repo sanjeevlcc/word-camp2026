@@ -188,6 +188,16 @@ docker run --rm --name uniportal -p 5000:5000 university-portal:1
 ******************************************
 4) Kubernetes (self-healing + HPA + rollback) 
 ******************************************
+4-node minikube cluster 
+(✅ 1 control-plane + 3 workers) 
+
+the workers as:
+    worker-1 = butwal   portal-m02
+    worker-2 = chitwan  portal-m03
+    worker-3 = dang     portal-m04
+
+    
+portal, portal-m02, portal-m03, portal-m04
 
 
 -------------------------------------------
