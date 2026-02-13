@@ -182,7 +182,7 @@ docker run --rm --name uniportal -p 5000:5000 university-portal:1
 
 
 
-
+ 
 
 
 ******************************************
