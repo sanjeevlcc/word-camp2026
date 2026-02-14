@@ -1,10 +1,18 @@
 
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: uniportal
+  namespace: demo
 spec:
   replicas: 3
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: uniportal
@@ -15,22 +23,22 @@ spec:
     spec:
       containers:
       - name: uniportal
-        image: university-portal:1
+        image: huma11994/university-portal:1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
         env:
         - name: RUN_MODE
-          value: "Kubernetes"
+          value: "Kubernetes (replicas=1 for login)"
         - name: APP_SECRET
           value: "change-me"
         resources:
           requests:
-            cpu: "100m"
+            cpu: "150m"
             memory: "128Mi"
           limits:
-            cpu: "300m"
-            memory: "200Mi"
+            cpu: "400m"
+            memory: "256Mi"
         readinessProbe:
           httpGet:
             path: /healthz
@@ -41,18 +49,21 @@ spec:
           httpGet:
             path: /healthz
             port: 5000
-          initialDelaySeconds: 5
+          initialDelaySeconds: 8
           periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: uniportal-svc
+  namespace: demo
 spec:
   selector:
     app: uniportal
   type: NodePort
+  sessionAffinity: ClientIP
   ports:
-  - port: 80
+  - name: http
+    port: 80
     targetPort: 5000
 
