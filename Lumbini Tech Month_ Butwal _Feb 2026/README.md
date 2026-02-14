@@ -76,12 +76,8 @@ sudo apt install -y python3 python3-venv python3-pip
 Step 2.2 — Create venv + install dependencies
 -------------------------------------------
 pwd
-pwd
-sleep 2
-cd /root/word-camp2026/Lumbini\ Tech\ Month_\ Butwal\ _Feb\ 2026/
 python3 -m venv venv
 source venv/bin/activate
-sleep 5
 pip install -r requirements.txt
 
 
@@ -191,17 +187,92 @@ node01         Ready    <none>          12d   v1.34.3
 
 
 
+
+kubectl create namespace demo
+
+
 Step 4.2 — Create Kubernetes manifests
 -------------------------------------------
-https://github.com/sanjeevlcc/word-camp2026/blob/main/Lumbini%20Tech%20Month_%20Butwal%20_Feb%202026/my_app.yaml
+
+kubectl create namespace demo
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uniportal
+  namespace: demo
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: uniportal
+  template:
+    metadata:
+      labels:
+        app: uniportal
+    spec:
+      containers:
+      - name: uniportal
+        image: huma11994/university-portal:1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        env:
+        - name: RUN_MODE
+          value: "Kubernetes (replicas=1 for login)"
+        - name: APP_SECRET
+          value: "change-me"
+        resources:
+          requests:
+            cpu: "150m"
+            memory: "128Mi"
+          limits:
+            cpu: "400m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 8
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uniportal-svc
+  namespace: demo
+spec:
+  selector:
+    app: uniportal
+  type: NodePort
+  sessionAffinity: ClientIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+
+
 
 
 
 Apply:
      kubectl apply -f k8s.yaml
 
-
-
+kubectl scale deployment --replicas 3 -n demo uniportal 
 
 -------------------------------------------
 
