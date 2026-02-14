@@ -1,11 +1,11 @@
  
-************************************
-Traditional → Docker → Kubernetes
-************************************
+   ************************************
+   Traditional → Docker → Kubernetes
+   ************************************
 
 
 
-
+ 
 
 
 
@@ -99,6 +99,8 @@ http://SERVER_IP:5000
           admin / Admin@123
 
 
+
+
 Step 2.5 — Crash the whole app 
           (proves traditional downtime)
 -------------------------------------------
@@ -133,9 +135,31 @@ docker --version
 
 
 
+
+
 Step 3.2 — Create Dockerfile
 -------------------------------------------
-https://github.com/sanjeevlcc/word-camp2026/blob/main/Lumbini%20Tech%20Month_%20Butwal%20_Feb%202026/Dockerfile
+
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+COPY templates ./templates
+
+ENV RUN_MODE="Docker"
+ENV APP_SECRET="change-me"
+
+EXPOSE 5000
+CMD ["gunicorn","-w","1","-b","0.0.0.0:5000","app:app"]
+
+
+
+
+
+
 
 
 
@@ -148,6 +172,9 @@ docker build -t university-portal:1 .
 Step 3.4 — Run container
 -------------------------------------------
 docker run --rm --name uniportal -p 5000:5000 university-portal:1
+
+
+
 
 
 
@@ -167,17 +194,14 @@ docker run --rm --name uniportal -p 5000:5000 university-portal:1
  
 
 
+
+
 ******************************************
 4) Kubernetes (self-healing + HPA + rollback) 
 ******************************************
 
-4-node minikube cluster 
-(✅ 1 control-plane + 1 workers) 
 
-the workers as:
-    worker-1 = butwal   portal-m02
-    worker-2 = chitwan  portal-m03
-    worker-3 = dang     portal-m04
+(✅ 1 control-plane + 1 workers) 
 
     
 controlplane:~$ kubectl get nodes
@@ -188,21 +212,16 @@ node01         Ready    <none>          12d   v1.34.3
 
 
 
-kubectl create namespace demo
 
 
-Step 4.2 — Create Kubernetes manifests
+
+Step 4.1 — Create Kubernetes manifests
 -------------------------------------------
-
-kubectl create namespace demo
-
-
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: uniportal
-  namespace: demo
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -254,7 +273,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: uniportal-svc
-  namespace: demo
 spec:
   selector:
     app: uniportal
@@ -267,22 +285,135 @@ spec:
 
 
 
+kubectl apply -f uniportal.yaml
+
+kubectl scale deployment uniportal --replicas 3
 
 
-Apply:
-     kubectl apply -f k8s.yaml
+kubectl rollout status deployment/uniportal
+kubectl get pods -o wide
+kubectl get svc uniportal-svc
 
-kubectl scale deployment --replicas 3 -n demo uniportal 
 
+
+
+
+
+Step 4.2 — Scale to 3 replicas (HA + load balancing)
+-------------------------------------------
+
+kubectl scale deployment/uniportal --replicas=3
+kubectl get pods -o wide
+
+
+      Refresh /whoami multiple times → you’ll see 
+      different pod hostnames.
+      
+      Crash one pod with /crash → service stays 
+      up (other replicas serve) → crashed pod is recreated.
+
+
+
+
+
+
+
+
+Step 4.4 — HPA (autoscale 3 → 10)
+-------------------------------------------
+
+4.1a Ensure metrics server works
+---------------------------------
+kubectl top nodes
+
+
+If not available:
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+
+Recheck:
+    kubectl top nodes
+    kubectl top pods
+
+
+
+4.2 Create HPA
+-----------------
+cat > hpa.yaml <<'YAML'
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: uniportal-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: uniportal
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+    
+YAML
+
+
+
+
+
+kubectl apply -f hpa.yaml
+kubectl get hpa
+kubectl get hpa -w
+
+
+
+
+
+4.3 Generate load
+-----------------
+kubectl run -it --rm loadgen --image=busybox:1.36 --restart=Never -- /bin/sh
+
+
+Inside:
+-----------------
+while true; do wget -q -O- http://uniportal-svc/burn >/dev/null; done
+
+
+In another terminal:
+
+kubectl get pods -w
+kubectl top pods
+
+
+✅ HPA scales pods above 3.
+
+Stop loadgen: Ctrl+C
 -------------------------------------------
 
 
 
 
 
+Step 4.3 — s
+-------------------------------------------
 
 
 
+
+Step 4.3 — s
+-------------------------------------------
+
+
+
+
+Step 4.3 — s
+-------------------------------------------
 
 -------------------------------------------
 
